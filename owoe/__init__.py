@@ -44,7 +44,7 @@ class Owoe:
         else:
             self.session = session
 
-    async def update_types(self):
+    async def update_image_types(self):
         """Update the image types `list` by calling the `/types` endpoint. This is a coroutine.
 
         You must call this to populate the types `list`.
@@ -61,7 +61,7 @@ class Owoe:
                 return
             return response.status
 
-    async def update_tags(self):
+    async def update_image_tags(self):
         """Update the image tags `list` by calling the `/tags` endpoint. This is a coroutine.
 
         You must call this to populate the tags `list`.
