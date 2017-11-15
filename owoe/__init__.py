@@ -95,6 +95,7 @@ class Owoe:
         if type_:
             parameters_url["type"] = type_
         if tags:
+            tags = [urllib.parse.quote(tag) for tag in tags]
             parameters_url["tags"] = urllib.parse.quote_plus(" ".join(tags))
 
         parameters_url = urllib.parse.urlencode(parameters_url)
