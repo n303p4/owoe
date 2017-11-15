@@ -14,16 +14,6 @@ BASE_URL_TAGS = "https://api.weeb.sh/images/tags"
 BASE_URL_RANDOM = "https://api.weeb.sh/images/random?{0}"
 
 
-class InvalidImageType(Exception):
-    """Raised if the image type is not valid."""
-    pass
-
-
-class InvalidImageTag(Exception):
-    """Raised if the image tag is not valid."""
-    pass
-
-
 class Owoe:
     """A class that contains a simple interface for weeb.sh.
 
@@ -93,7 +83,6 @@ class Owoe:
 
         Possible return values are as follows:
 
-        * If `type_` is not valid, raises an `Owoe.InvalidImageType` error.
         * If successful, returns an `str` with the URL of the image.
         * If an HTTP status error occurs, returns an `int` with the status code.
 
@@ -102,12 +91,6 @@ class Owoe:
                     built-in Python `type`.
         * `tags` - A `list` of `str` to use in the image search.
         """
-        if type_ not in self.types and not tags:
-            raise InvalidImageType()
-        for tag in tags:
-            if tag not in self.tags:
-                raise InvalidImageTag()
-
         parameters_url = {}
         if type_:
             parameters_url["type"] = type_
