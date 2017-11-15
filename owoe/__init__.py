@@ -30,8 +30,9 @@ class Owoe:
         **Fields not in the constructor**
 
         * `types` - A `list` of `str` containing all valid image types. It's recommended not to
-                    update this yourself; instead, call `update_image_types()`. Owoe will not work
-                    if you do not have this `list` populated.
+                    update this yourself; instead, call `update_image_types()`.
+        * `tags` - A `list` of `str` containing all valid image tags. It's recommended not to
+                   update this yourself; instead, call `update_image_tags()`.
         * `headers` - A `dict` for simple HTTP authorization.
         """
         self.token = token
@@ -95,7 +96,6 @@ class Owoe:
         if type_:
             parameters_url["type"] = type_
         if tags:
-            tags = [urllib.parse.quote(tag) for tag in tags]
             parameters_url["tags"] = urllib.parse.quote_plus(" ".join(tags))
 
         parameters_url = urllib.parse.urlencode(parameters_url)
