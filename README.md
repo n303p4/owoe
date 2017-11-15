@@ -1,6 +1,8 @@
 # owoe
 A dead simple aiohttp-based library for weeb.sh. Nothing more. Honest.
 
+Still under construction, moving along.
+
 ## Installation
 
 In a terminal on Linux, type:

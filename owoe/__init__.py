@@ -2,17 +2,25 @@
 
 """A dead simple aiohttp-based library for weeb.sh. Nothing more. Honest."""
 
+from typing import List
+
 import urllib
 import asyncio
 
 import aiohttp
 
 BASE_URL_TYPES = "https://api.weeb.sh/images/types"
+BASE_URL_TAGS = "https://api.weeb.sh/images/tags"
 BASE_URL_RANDOM = "https://api.weeb.sh/images/random?{0}"
 
 
 class InvalidImageType(Exception):
     """Raised if the image type is not valid."""
+    pass
+
+
+class InvalidImageTag(Exception):
+    """Raised if the image tag is not valid."""
     pass
 
 
@@ -39,16 +47,17 @@ class Owoe:
         self.token = token
         self.headers = {"Authorization": f"Wolke {token}"}
         self.types = []
+        self.tags = []
         if not session:
             loop = asyncio.get_event_loop()
             self.session = aiohttp.ClientSession(loop=loop)
         else:
             self.session = session
 
-    async def update_image_types(self):
+    async def update_types(self):
         """Update the image types `list` by calling the `/types` endpoint. This is a coroutine.
 
-        You must call this to populate the types `list`, otherwise Owoe will not work.
+        You must call this to populate the types `list`.
 
         If successful, returns a `None`, otherwise returns an `int` with an HTTP status code.
         """
@@ -62,7 +71,24 @@ class Owoe:
                 return
             return response.status
 
-    async def random_image(self, type_: str=None, tags: str=None):
+    async def update_tags(self):
+        """Update the image tags `list` by calling the `/types` endpoint. This is a coroutine.
+
+        You must call this to populate the tags `list`.
+
+        If successful, returns a `None`, otherwise returns an `int` with an HTTP status code.
+        """
+        async with self.session.get(BASE_URL_TAGS, headers=self.headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                tags = data["tags"]
+                self.tags = []
+                for tag in tags:
+                    self.tags.append(tag)
+                return
+            return response.status
+
+    async def random_image(self, type_: str=None, tags: List[str]=[]):
         """Get a random image from weeb.sh by calling the `/random` endpoint. This is a coroutine.
 
         Possible return values are as follows:
@@ -74,16 +100,19 @@ class Owoe:
         * `type_` - An `str` representing the type of the image to be obtained.
                     Must be in `self.types`. Has an underscore to avoid colliding with
                     built-in Python `type`.
-        * `tags` - An `str` representing a list of tags to use in the image search.
+        * `tags` - A `list` of `str` to use in the image search.
         """
         if type_ not in self.types and not tags:
             raise InvalidImageType()
+        for tag in tags:
+            if tag not in self.tags:
+                raise InvalidImageTag()
 
         parameters_url = {}
         if type_:
             parameters_url["type"] = type_
         if tags:
-            parameters_url["tags"] = tags
+            parameters_url["tags"] = urllib.parse.quote_plus(" ".join(tags))
 
         parameters_url = urllib.parse.urlencode(parameters_url)
 
