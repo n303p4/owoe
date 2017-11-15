@@ -72,7 +72,7 @@ class Owoe:
             return response.status
 
     async def update_tags(self):
-        """Update the image tags `list` by calling the `/types` endpoint. This is a coroutine.
+        """Update the image tags `list` by calling the `/tags` endpoint. This is a coroutine.
 
         You must call this to populate the tags `list`.
 
