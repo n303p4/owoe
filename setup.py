@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name="owoe",
-      version="0.0.1",
+      version="0.0.1a",
       description="A wrapper for weeb.sh",
       license="MIT",
       packages=["owoe"],

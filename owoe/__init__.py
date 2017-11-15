@@ -22,12 +22,12 @@ class Owoe:
     This will typically be used compositionally, as a component of a larger class.
     """
 
-    def __init__(self, token: str=None, clientsession: aiohttp.ClientSession=None):
+    def __init__(self, token: str=None, session: aiohttp.ClientSession=None):
         """Constructor method for `Owoe`.
 
         * `token` - An `str` containing your token from Wolke.
-        * `clientsession` - An optional `aiohttp.ClientSession` to use Owoe with another program. If
-                            not supplied, Owoe will create one for itself to be used standalone.
+        * `session` - An optional `aiohttp.ClientSession` to use Owoe with another program. If
+                      not supplied, Owoe will create one for itself to be used standalone.
 
         **Fields not in the constructor**
 
@@ -39,11 +39,11 @@ class Owoe:
         self.token = token
         self.headers = {"Authorization": f"Wolke {token}"}
         self.types = []
-        if not clientsession:
+        if not session:
             loop = asyncio.get_event_loop()
-            self.clientsession = aiohttp.ClientSession(loop=loop)
+            self.session = aiohttp.ClientSession(loop=loop)
         else:
-            self.clientsession = clientsession
+            self.session = session
 
     async def update_image_types(self):
         """Update the image types `list` by calling the `/types` endpoint. This is a coroutine.
@@ -52,7 +52,7 @@ class Owoe:
 
         If successful, returns a `None`, otherwise returns an `int` with an HTTP status code.
         """
-        async with self.clientsession.get(BASE_URL_TYPES, headers=self.headers) as response:
+        async with self.session.get(BASE_URL_TYPES, headers=self.headers) as response:
             if response.status == 200:
                 data = await response.json()
                 types = data["types"]
@@ -62,7 +62,7 @@ class Owoe:
                 return
             return response.status
 
-    async def random_image(self, type_: str, tags: str):
+    async def random_image(self, type_: str=None, tags: str=None):
         """Get a random image from weeb.sh by calling the `/random` endpoint. This is a coroutine.
 
         Possible return values are as follows:
@@ -76,7 +76,7 @@ class Owoe:
                     built-in Python `type`.
         * `tags` - An `str` representing a list of tags to use in the image search.
         """
-        if type_ not in self.types:
+        if type_ not in self.types and not tags:
             raise InvalidImageType()
 
         parameters_url = {}
@@ -89,7 +89,7 @@ class Owoe:
 
         url_random = BASE_URL_RANDOM.format(parameters_url)
 
-        async with self.clientsession.get(url_random, headers=self.headers) as response:
+        async with self.session.get(url_random, headers=self.headers) as response:
             if response.status == 200:
                 data = await response.json()
                 url_image = data["url"]
